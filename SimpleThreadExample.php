@@ -7,7 +7,7 @@
 
 namespace DianaArnos\DarkmiraTourBR2016;
 
-class SimpleWorkerExample extends \Thread
+class SimpleThreadExample extends \Thread
 {
     /** @var  int */
     private $workerId = 0;
@@ -19,9 +19,9 @@ class SimpleWorkerExample extends \Thread
 
     public function run()
     {
-        echo "Worker " . $this->workerId . " começou a executar.\n";
+        echo "Thread " . $this->workerId . " começou a executar.\n";
         sleep(rand(0, 3));
-        echo "Worker " . $this->workerId . " parou de executar.\n";
+        echo "Thread " . $this->workerId . " parou de executar.\n";
     }
 }
 
@@ -29,7 +29,7 @@ class SimpleWorkerExample extends \Thread
 $workerPool = [];
 
 foreach (range(0, 10) as $id) {
-    $workerPool[$id] = new SimpleWorkerExample($id);
+    $workerPool[$id] = new SimpleThreadExample($id);
     $workerPool[$id]->start();
 }
 
