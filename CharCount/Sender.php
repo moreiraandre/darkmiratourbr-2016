@@ -11,6 +11,7 @@ class Sender extends \Thread
 {
     private $workerHost = '';
     private $text = '';
+    public $result;
 
     public function __construct($workerHost, $text)
     {
@@ -28,6 +29,8 @@ class Sender extends \Thread
 
         fwrite($client, base64_encode($this->text));
 
-        return stream_get_contents($client);
+        $this->result = stream_get_contents($client);
+
+        fclose($client);
     }
 }

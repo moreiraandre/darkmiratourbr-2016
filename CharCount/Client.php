@@ -7,21 +7,23 @@
 
 namespace DianaArnos\DarkmiraTourBR2016\CharCount;
 
+require('Sender.php');
+
 class Client
 {
-    private $filePath;
+    private $filePath = '';
     private $workerHosts = [];
     private $tmpFolder = 'tmp';
-    private $filePieces;
-    private $buffer = 1024;
+    private $filePieces = 0;
+    private $senderPool = [];
 
     public function __construct($args)
     {
+        $this->filePath = $args[1];
         for ($i = 2; $i < count($args); $i++) {
             array_push($this->workerHosts, $args[$i]);
         }
 
-        $this->filePath = $args[1];
         $this->filePieces = count($this->workerHosts);
     }
 
@@ -29,7 +31,8 @@ class Client
     {
         $this->showWorkers();
         $this->splitFile();
-//        $this->sendFilePiecesToWorkers();
+        $results = $this->sendFilePiecesToWorkers();
+        echo 'Há ' . array_sum($results).' caracteres no arquivo.' . PHP_EOL;
     }
 
     protected function showWorkers()
@@ -50,9 +53,9 @@ class Client
         $handle = fopen($this->filePath, 'rb');
 
         $i = 1;
-        while (!feof($handle)) {
+        while (!feof($handle) && $i <= count($this->workerHosts)) {
             $buffer = fread($handle, round($pieceSize));
-            $pieceName = $this->tmpFolder.'/piece_'.$i.'.txt';
+            $pieceName = $this->tmpFolder . '/piece_' . $i . '.txt';
             $fw = fopen($pieceName, 'wb');
             fwrite($fw, $buffer);
             fclose($fw);
@@ -61,6 +64,26 @@ class Client
 
         fclose($handle);
 
+    }
+
+    private function sendFilePiecesToWorkers()
+    {
+        $results = [];
+        $i = 1;
+        foreach ($this->workerHosts as $worker) {
+            $handle = fopen($this->tmpFolder . '/piece_' . $i . '.txt', 'rb');
+            $text = fread($handle, 1048576); //1Mb
+            $this->senderPool[$worker] = new Sender($worker, $text);
+            $this->senderPool[$worker]->start();
+            $i++;
+        }
+        /** @var Sender $sender */
+        foreach ($this->senderPool as $sender) {
+            $sender->join();
+            array_push($results, $sender->result);
+        }
+
+        return $results;
     }
 
 }

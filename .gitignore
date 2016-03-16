@@ -1,3 +1,4 @@
 .idea
 /phansible_darkmira
-tmp/piece*
+/CharCount/tmp/piece*
+.DS_Store
