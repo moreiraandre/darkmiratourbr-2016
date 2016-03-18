@@ -24,12 +24,14 @@ class Sender extends \Thread
         $client = stream_socket_client("tcp://$this->workerHost", $errorNum, $errorMsg, 10);
 
         if ($client == false) {
-            throw new \UnexpectedValueException("Falha ao conectar: {$errorNum} - {$errorMsg}". PHP_EOL);
+            throw new \UnexpectedValueException("Falha ao conectar: {$errorNum} - {$errorMsg}" . PHP_EOL);
         }
 
+        echo "Thread {$this->getThreadId()} - Enviando dados ao Worker...\n";
         fwrite($client, base64_encode($this->text));
 
         $this->result = stream_get_contents($client);
+        echo "Resultado recebido\n";
 
         fclose($client);
     }

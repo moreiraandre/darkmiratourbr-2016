@@ -32,7 +32,7 @@ class Client
         $this->showWorkers();
         $this->splitFile();
         $results = $this->sendFilePiecesToWorkers();
-        echo 'Há ' . array_sum($results).' caracteres no arquivo.' . PHP_EOL;
+        echo 'Há ' . array_sum($results) . ' caracteres no arquivo ' . $this->filePath . PHP_EOL;
     }
 
     protected function showWorkers()
@@ -73,6 +73,7 @@ class Client
         foreach ($this->workerHosts as $worker) {
             $handle = fopen($this->tmpFolder . '/piece_' . $i . '.txt', 'rb');
             $text = fread($handle, 1048576); //1Mb
+            echo "Iniciando threads...\n";
             $this->senderPool[$worker] = new Sender($worker, $text);
             $this->senderPool[$worker]->start();
             $i++;
@@ -80,12 +81,12 @@ class Client
         /** @var Sender $sender */
         foreach ($this->senderPool as $sender) {
             $sender->join();
+            echo "Encerrando thread...\n";
             array_push($results, $sender->result);
         }
 
         return $results;
     }
-
 }
 
 $client = new Client($argv);
