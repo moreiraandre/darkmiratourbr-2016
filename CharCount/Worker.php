@@ -26,7 +26,9 @@ class Worker
             );
         }
 
+        $countConn = 0;
         while ($conn = stream_socket_accept($server)) {
+            echo ++$countConn . ' ';
             $result = strlen(base64_decode(fread($conn, 13421772)));
             fwrite($conn, $result . PHP_EOL);
             fclose($conn);
