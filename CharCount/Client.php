@@ -7,17 +7,19 @@
 
 namespace DianaArnos\DarkmiraTourBR2016\CharCount;
 
+require('Sender.php');
+
 class Client
 {
     private $filePath = '';
     private $workerHosts = [];
-    private $tmpFolder = 'tmp';
+    private $tmpFolder = __DIR__ . '/tmp';
     private $filePieces = 0;
     private $senderPool = [];
 
     public function __construct($args)
     {
-        $this->filePath = $args[1];
+        $this->filePath = __DIR__ . '/' . $args[1];
         for ($i = 2; $i < count($args); $i++) {
             array_push($this->workerHosts, $args[$i]);
         }
